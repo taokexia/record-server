@@ -13,10 +13,12 @@ export default (appInfo: EggAppInfo) => {
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
-    sequalize: {
+    sequelize: {
       dialect: 'mysql',
       host: '127.0.0.1',
       port: 3306,
+      username: 'root',
+      password: '123456',
       database: 'record'
     }
   };
