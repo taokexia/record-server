@@ -4,9 +4,9 @@ export default () => {
   const config: PowerPartial<EggAppConfig> = {
     security: {
       csrf: {
-        enable: false
-      }
-    }
+        enable: false,
+      },
+    },
   };
   return config;
 };

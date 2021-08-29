@@ -19,8 +19,11 @@ export default (appInfo: EggAppInfo) => {
       port: 3306,
       username: 'root',
       password: '123456',
-      database: 'record'
-    }
+      database: 'record',
+    },
+    jwt: {
+      secret: 'Bob',
+    },
   };
 
   // the return config will combines to EggAppConfig

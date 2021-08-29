@@ -11,10 +11,10 @@ export default class User extends Service {
     try {
       const result = await app.model.User.findOne({
         where: {
-          username
-        }
+          username,
+        },
       });
-      return result
+      return result;
     } catch (error) {
       console.log(error);
       return null;
