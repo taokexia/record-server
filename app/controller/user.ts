@@ -1,7 +1,7 @@
 /*
  * @Author: taokexia
  * @Date: 2021-08-29 23:03:16
- * @LastEditTime: 2021-08-30 00:39:30
+ * @LastEditTime: 2021-08-30 09:20:18
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \record-servercd\app\controller\user.ts
@@ -10,6 +10,12 @@ import { Controller } from 'egg';
 
 // 默认头像，放在 user.js 的最外，部避免重复声明。
 const defaultAvatar = 'http://s.yezgea02.com/1615973940679/WeChat77d6d2ac093e247c361f0b8a7aeb6c2a.png';
+
+type tokenType = {
+  id: string;
+  username: string;
+  exp: number;
+}
 
 export default class UserController extends Controller {
   // 注册
@@ -88,7 +94,7 @@ export default class UserController extends Controller {
       id: userInfo.getDataValue('id'),
       username: userInfo.getDataValue('username'),
       exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // token 有效期为 24 小时
-    }, app.config.jwt.secret);
+    } as tokenType, app.config.jwt.secret);
 
     ctx.body = {
       code: 200,
@@ -96,6 +102,26 @@ export default class UserController extends Controller {
       data: {
         token,
       },
+    };
+  }
+
+  // 获取用户信息
+  async getUserInfo() {
+    const { ctx } = this;
+    // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+    const decode = ctx.decode as tokenType;
+    // 通过 getUserByName 方法，以用户名 decode.username 为参数，从数据库获取到该用户名下的相关信息
+    const userInfo = await ctx.service.user.getUserByName(decode.username);
+    // userInfo 中应该有密码信息，所以我们指定下面四项返回给客户端
+    ctx.body = {
+      code: 200,
+      msg: '请求成功',
+      data: {
+        id: userInfo?.getDataValue('id'),
+        username: userInfo?.getDataValue('username'),
+        signature: userInfo?.getDataValue('signature') || '',
+        avatar: userInfo?.getDataValue('avatar') || defaultAvatar
+      }
     };
   }
 }
