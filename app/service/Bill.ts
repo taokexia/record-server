@@ -1,5 +1,5 @@
 import { Service } from 'egg';
-import { BillType } from '../model/bill';
+import { BillEditType, BillType } from '../model/bill';
 
 /**
  * Bill Service
@@ -34,7 +34,8 @@ export default class Bill extends Service {
     if (type_id !== 'all') where.type_id = type_id;
     try {
       const result = await app.model.Bill.findAll({
-        where
+        where,
+        attributes: ['id', 'pay_type', 'amount', 'date', 'type_name']
       });
       return result;
     } catch (error) {
@@ -54,6 +55,38 @@ export default class Bill extends Service {
       return result;
     } catch (error) {
       console.log(error);
+      return null;
+    }
+  }
+
+  // 查看细节
+  public async detail(id) {
+    const { app } = this;
+    try {
+      const result = app.model.Bill.findOne({
+        where: {
+          id
+        }
+      });
+      return result;
+    } catch (error) {
+      return null;
+    }
+  }
+  // 更新细节
+  public async update(params: BillEditType) {
+    const { app } = this;
+    try {
+      const result = app.model.Bill.update({
+        ...params
+      }, {
+        where: {
+          id: params.id,
+          user_id: params.user_id
+        }
+      });
+      return result;
+    } catch (error) {
       return null;
     }
   }

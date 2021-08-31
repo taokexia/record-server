@@ -11,6 +11,8 @@ export type BillType = {
   remark?: number;
 }
 
+export type BillEditType = Partial<BillType>;
+
 export default (app: Application) => {
   const { STRING, INTEGER, DATE } = app.Sequelize;
 

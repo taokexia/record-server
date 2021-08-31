@@ -1,5 +1,5 @@
 import { Controller } from 'egg';
-import { BillType } from '../model/bill';
+import { BillEditType, BillType } from '../model/bill';
 import { tokenType } from '../service/User';
 const moment = require('moment');
 
@@ -137,6 +137,101 @@ export default class BillController extends Controller {
         ctx.body = {
           code: 500,
           msg: '未查询到数据',
+          data: null
+        }
+      }
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '系统错误',
+        data: null
+      }
+    }
+  }
+
+  public async detail() {
+    const { ctx } = this;
+    // 获取账单 id 参数
+    const { id = '' } = ctx.query;
+    // 判断是否传入账单 id
+    if (!id) {
+      ctx.body = {
+        code: 500,
+        msg: '订单id不能为空',
+        data: null
+      }
+      return
+    }
+
+    try {
+      // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+      const decode = ctx.decode as tokenType;
+      if (!decode) return;
+      // const user_id = Number(decode.id);
+      // 拿到当前用户的账单列表
+      const detail = await ctx.service.bill.detail(id);
+      if (detail) {
+        ctx.body = {
+          code: 200,
+          msg: '请求成功',
+          data: detail.toJSON()
+        }
+      } else {
+        ctx.body = {
+          code: 500,
+          msg: '未查询到数据!',
+          data: null
+        }
+      }
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '系统错误',
+        data: null
+      }
+    }
+  }
+
+  public async update() {
+    const { ctx } = this;
+    // 账单的相关参数，这里注意要把账单的 id 也传进来
+    const { id, amount, type_id, type_name, date, pay_type, remark = '' } = ctx.request.body;
+    // 判空处理
+    if (!id) {
+      ctx.body = {
+        code: 400,
+        msg: '参数错误',
+        data: null
+      }
+    }
+
+    try {
+      // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+      const decode = ctx.decode as tokenType;
+      if (!decode) return;
+      const user_id = Number(decode.id);
+      const params: BillEditType = {
+        user_id,
+        id
+      };
+      if (amount) params.amount = amount;
+      if (type_id) params.type_id = type_id; 
+      if (type_name) params.type_name = type_name; 
+      if (date) params.date = date; 
+      if (pay_type) params.pay_type = pay_type; 
+      if (remark) params.remark = remark; 
+      // 拿到当前用户的账单列表
+      const detail = await ctx.service.bill.update(params);
+      if (detail) {
+        ctx.body = {
+          code: 200,
+          msg: '请求成功',
+          data: detail
+        }
+      } else {
+        ctx.body = {
+          code: 500,
+          msg: '未查询到数据!',
           data: null
         }
       }
