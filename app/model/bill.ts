@@ -1,5 +1,16 @@
 import { Application } from 'egg';
 
+export type BillType = {
+  id?: number;
+  pay_type: number;
+  amount: string;
+  date: string;
+  type_id: number;
+  type_name: string;
+  user_id: number;
+  remark?: number;
+}
+
 export default (app: Application) => {
   const { STRING, INTEGER, DATE } = app.Sequelize;
 

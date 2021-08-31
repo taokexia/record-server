@@ -1,6 +1,13 @@
 import { Service } from 'egg';
 import { UserEditType, UserType } from '../model/user';
 import { createHash } from 'crypto';
+
+export type tokenType = {
+  id: string;
+  username: string;
+  exp: number;
+}
+
 /**
  * User Service
  */

@@ -1,21 +1,17 @@
 /*
  * @Author: taokexia
  * @Date: 2021-08-29 23:03:16
- * @LastEditTime: 2021-08-31 08:56:52
+ * @LastEditTime: 2021-08-31 22:31:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \record-servercd\app\controller\user.ts
  */
 import { Controller } from 'egg';
+import { tokenType } from '../service/User';
 
 // 默认头像，放在 user.js 的最外，部避免重复声明。
 const defaultAvatar = 'http://s.yezgea02.com/1615973940679/WeChat77d6d2ac093e247c361f0b8a7aeb6c2a.png';
 
-type tokenType = {
-  id: string;
-  username: string;
-  exp: number;
-}
 
 export default class UserController extends Controller {
   // 注册
