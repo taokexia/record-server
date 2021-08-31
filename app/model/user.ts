@@ -9,6 +9,8 @@ export type UserType = {
   ctime?: Date;
 };
 
+export type UserEditType = Partial<UserType>;
+
 export default (app: Application) => {
   const { STRING, INTEGER, DATE } = app.Sequelize;
 

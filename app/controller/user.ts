@@ -1,7 +1,7 @@
 /*
  * @Author: taokexia
  * @Date: 2021-08-29 23:03:16
- * @LastEditTime: 2021-08-30 09:20:18
+ * @LastEditTime: 2021-08-30 09:38:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \record-servercd\app\controller\user.ts
@@ -123,5 +123,38 @@ export default class UserController extends Controller {
         avatar: userInfo?.getDataValue('avatar') || defaultAvatar
       }
     };
+  }
+
+  // 修改用户信息
+  async editUserInfo() {
+    const { ctx } = this;
+    const { signature = '' } = ctx.request.body;
+
+    // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+    const decode = ctx.decode as tokenType;
+    if (!decode) return;
+    // 通过 username 查找 userInfo 完整信息
+    const userInfo = await ctx.service.user.getUserByName(decode.username);
+    // 通过 service 方法 editUserInfo 修改 signature 信息。
+    const result = await ctx.service.user.editUserInfo({
+      id: userInfo?.getDataValue('id'),
+      signature: signature || userInfo?.getDataValue('signature'),
+    });
+    if (result) {
+      ctx.body = {
+        code: 200,
+        msg: '请求成功',
+        data: {
+          signature,
+          username: decode.username
+        }
+      }
+    } else {
+      ctx.body = {
+        code: 500,
+        msg: '请求失败',
+        data: result
+      }
+    }
   }
 }

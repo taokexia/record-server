@@ -1,5 +1,5 @@
 import { Service } from 'egg';
-import { UserType } from '../model/user';
+import { UserEditType, UserType } from '../model/user';
 import { createHash } from 'crypto';
 /**
  * User Service
@@ -13,6 +13,23 @@ export default class User extends Service {
         where: {
           username,
         },
+      });
+      return result;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  public async editUserInfo(userInfo: UserEditType) {
+    const { app } = this;
+    try {
+      const result = await app.model.User.update({
+        ...userInfo
+      }, {
+        where: {
+          id: userInfo.id
+        }
       });
       return result;
     } catch (error) {
