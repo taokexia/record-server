@@ -1,7 +1,7 @@
 /*
  * @Author: taokexia
  * @Date: 2021-08-29 23:03:16
- * @LastEditTime: 2021-08-30 09:38:45
+ * @LastEditTime: 2021-08-31 08:56:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \record-servercd\app\controller\user.ts
@@ -128,7 +128,7 @@ export default class UserController extends Controller {
   // 修改用户信息
   async editUserInfo() {
     const { ctx } = this;
-    const { signature = '' } = ctx.request.body;
+    const { signature = '', avatar = '' } = ctx.request.body;
 
     // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
     const decode = ctx.decode as tokenType;
@@ -139,6 +139,7 @@ export default class UserController extends Controller {
     const result = await ctx.service.user.editUserInfo({
       id: userInfo?.getDataValue('id'),
       signature: signature || userInfo?.getDataValue('signature'),
+      avatar: avatar || userInfo?.getDataValue('avatar')
     });
     if (result) {
       ctx.body = {
@@ -146,7 +147,8 @@ export default class UserController extends Controller {
         msg: '请求成功',
         data: {
           signature,
-          username: decode.username
+          username: decode.username,
+          avatar: avatar || userInfo?.getDataValue('avatar')
         }
       }
     } else {
