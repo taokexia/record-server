@@ -24,6 +24,16 @@ export default (appInfo: EggAppInfo) => {
     jwt: {
       secret: 'Bob',
     },
+    multipart: {
+      mode: 'file'
+    },
+    uploadDir: 'public/upload',
+    // cors
+    cors: {
+      origin: '*',
+      credential: true,
+      allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH'
+    }
   };
 
   // the return config will combines to EggAppConfig
