@@ -8,6 +8,13 @@ type listType = {
   bills: Array<BillType>;
 }
 
+type dataType = {
+  type_id: number;
+  type_name: string;
+  pay_type: number;
+  number: number;
+}
+
 export default class BillController extends Controller {
   public async add() {
     const { ctx } = this;
@@ -227,6 +234,124 @@ export default class BillController extends Controller {
           code: 200,
           msg: '请求成功',
           data: detail
+        }
+      } else {
+        ctx.body = {
+          code: 500,
+          msg: '未查询到数据!',
+          data: null
+        }
+      }
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '系统错误',
+        data: null
+      }
+    }
+  }
+
+  public async delete() {
+    const { ctx } = this;
+    // 账单的相关参数，这里注意要把账单的 id 也传进来
+    const { id } = ctx.request.body;
+    // 判空处理
+    if (!id) {
+      ctx.body = {
+        code: 400,
+        msg: '参数错误',
+        data: null
+      }
+    }
+
+    try {
+      // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+      const decode = ctx.decode as tokenType;
+      if (!decode) return;
+      const user_id = Number(decode.id);
+      const result = await ctx.service.bill.delete(id, user_id);
+      if (result) {
+        ctx.body = {
+          code: 200,
+          msg: '删除成功',
+          data: null
+        }
+      } else {
+        ctx.body = {
+          code: 500,
+          msg: '未查询到数据!',
+          data: null
+        }
+      }
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '系统错误',
+        data: null
+      }
+    }
+  }
+
+  public async data() {
+    const { ctx } = this;
+    // 获取，日期 date，分页数据，类型 type_id，这些都是我们在前端传给后端的数据
+    const { date = Date.now() } = ctx.query;
+
+    // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+    const decode = ctx.decode as tokenType;
+    if (!decode) return;
+    const user_id = Number(decode.id);
+    try {
+      // 获取账单表中的账单数据
+      const list = await ctx.service.bill.list(user_id, date, 'all');
+      if (list) {
+        // 累加计算支出
+        const totalExpense = list.reduce((curr, item) => {
+          if (item.getDataValue('pay_type') == 1) {
+            curr += Number(item.getDataValue('amount')) || 0;
+            return curr;
+          }
+          return curr;
+        }, 0);
+        // 累加计算收入
+        let totalIncome = list.reduce((curr, item) => {
+          if (item.getDataValue('pay_type') == 2) {
+            curr += Number(item.getDataValue('amount')) || 0;
+            return curr;
+          }
+          return curr;
+        }, 0);
+
+        // 获取收支构成
+        let totalData = list.reduce((arr, cur) => {
+          const index = arr.findIndex(item => item.type_id == cur.getDataValue('type_id'));
+          if (index == -1) {
+            arr.push({
+              type_id: cur.getDataValue('type_id'),
+              type_name: cur.getDataValue('type_name'),
+              pay_type: cur.getDataValue('pay_type'),
+              number: Number(cur.getDataValue('amount'))
+            });
+          }
+          if (index > -1) {
+            arr[index].number += Number(cur.getDataValue('amount'));
+          }
+          return arr;
+        }, [] as Array<dataType>);
+
+        totalData = totalData.map(item => {
+          item.number = Number(Number(item.number).toFixed(2))
+          return item
+        })
+
+        ctx.body = {
+          code: 200,
+          msg: '请求成功',
+          data: {
+            totalExpense: Number(totalExpense).toFixed(2),
+            totalIncome: Number(totalIncome).toFixed(2),
+            totalData: totalData || [],
+          }
         }
       } else {
         ctx.body = {

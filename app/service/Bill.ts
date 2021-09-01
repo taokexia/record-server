@@ -90,4 +90,20 @@ export default class Bill extends Service {
       return null;
     }
   }
+
+  // 删除
+  public async delete(id, user_id) {
+    const { app } = this;
+    try {
+      const result = app.model.Bill.destroy({
+        where: {
+          id,
+          user_id
+        }
+      });
+      return result;
+    } catch (error) {
+      return null;
+    }
+  }
 }
