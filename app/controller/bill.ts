@@ -1,19 +1,19 @@
 import { Controller } from 'egg';
 import { BillEditType, BillType } from '../model/bill';
 import { tokenType } from '../service/User';
-const moment = require('moment');
+import moment = require('moment');
 
 type listType = {
   date: string;
   bills: Array<BillType>;
-}
+};
 
 type dataType = {
   type_id: number;
   type_name: string;
   pay_type: number;
   number: number;
-}
+};
 
 export default class BillController extends Controller {
   public async add() {
@@ -25,8 +25,8 @@ export default class BillController extends Controller {
       ctx.body = {
         code: 400,
         msg: '参数错误',
-        data: null
-      }
+        data: null,
+      };
     }
     try {
       // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
@@ -42,29 +42,29 @@ export default class BillController extends Controller {
         type_name,
         date: date && !!Number(date) ? new Date(Number(date)).toISOString() : new Date(Date.now()).toISOString(),
         pay_type,
-        remark
+        remark,
       });
 
       if (result) {
         ctx.body = {
           code: 200,
           msg: '请求成功',
-          data: result
+          data: result,
         };
       } else {
         ctx.body = {
           code: 500,
           msg: '请求失败',
-          data: result
+          data: result,
         };
       }
-    } catch(error) {
+    } catch (error) {
       console.log(error);
       ctx.body = {
         code: 500,
         msg: '系统错误',
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
@@ -87,26 +87,26 @@ export default class BillController extends Controller {
           // 把第一个账单项的时间格式化为 YYYY-MM-DD
           const date = moment(item.date).format('YYYY-MM-DD');
           // 如果能在累加的数组中找到当前项日期 date，那么在数组中的加入当前项到 bills 数组。
-          if (curr && curr.length && curr.findIndex(currItem => currItem.date == date) > -1) {
-            const index = curr.findIndex(item => item.date == date);
+          if (curr && curr.length && curr.findIndex(currItem => currItem.date === date) > -1) {
+            const index = curr.findIndex(item => item.date === date);
             curr[index].bills.push(item);
           }
           // 如果在累加的数组中找不到当前项日期的，那么再新建一项。
-          if (curr && curr.length && curr.findIndex(currItem => currItem.date == date) == -1) {
+          if (curr && curr.length && curr.findIndex(currItem => currItem.date === date) === -1) {
             curr.push({
               date,
-              bills: [item]
-            })
+              bills: [ item ],
+            });
           }
           // 如果 curr 为空数组，则默认添加第一个账单项 item ，格式化为下列模式
           if (!curr.length) {
             curr.push({
               date,
-              bills: [item]
-            })
+              bills: [ item ],
+            });
           }
           return curr;
-        }, [] as Array<listType>).sort((a, b) => moment(b.date) - moment(a.date)); // 时间顺序为倒叙，时间约新的，在越上面
+        }, [] as Array<listType>).sort((a, b) => (new Date(b.date)).getTime() - (new Date(a.date)).getTime()); // 时间顺序为倒叙，时间约新的，在越上面
 
         // 分页处理，listMap 为我们格式化后的全部数据，还未分页。
         const startNum = (Number(page) - 1) * Number(page_size);
@@ -115,15 +115,15 @@ export default class BillController extends Controller {
 
         // 累加计算支出
         const totalExpense = list.reduce((curr, item) => {
-          if (item.getDataValue('pay_type') == 1) {
+          if (item.getDataValue('pay_type') === 1) {
             curr += Number(item.getDataValue('amount')) || 0;
             return curr;
           }
           return curr;
         }, 0);
         // 累加计算收入
-        let totalIncome = list.reduce((curr, item) => {
-          if (item.getDataValue('pay_type') == 2) {
+        const totalIncome = list.reduce((curr, item) => {
+          if (item.getDataValue('pay_type') === 2) {
             curr += Number(item.getDataValue('amount')) || 0;
             return curr;
           }
@@ -137,22 +137,22 @@ export default class BillController extends Controller {
             totalExpense, // 当月支出
             totalIncome, // 当月收入
             totalPage: Math.ceil(listMap.length / Number(page_size)), // 总分页
-            list: filterListMap || [] // 格式化后，并且经过分页处理的数据
-          }
-        }
+            list: filterListMap || [], // 格式化后，并且经过分页处理的数据
+          },
+        };
       } else {
         ctx.body = {
           code: 500,
           msg: '未查询到数据',
-          data: null
-        }
+          data: null,
+        };
       }
     } catch (error) {
       ctx.body = {
         code: 500,
         msg: '系统错误',
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
@@ -165,9 +165,9 @@ export default class BillController extends Controller {
       ctx.body = {
         code: 500,
         msg: '订单id不能为空',
-        data: null
-      }
-      return
+        data: null,
+      };
+      return;
     }
 
     try {
@@ -181,21 +181,21 @@ export default class BillController extends Controller {
         ctx.body = {
           code: 200,
           msg: '请求成功',
-          data: detail.toJSON()
-        }
+          data: detail.toJSON(),
+        };
       } else {
         ctx.body = {
           code: 500,
           msg: '未查询到数据!',
-          data: null
-        }
+          data: null,
+        };
       }
     } catch (error) {
       ctx.body = {
         code: 500,
         msg: '系统错误',
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
@@ -208,8 +208,8 @@ export default class BillController extends Controller {
       ctx.body = {
         code: 400,
         msg: '参数错误',
-        data: null
-      }
+        data: null,
+      };
     }
 
     try {
@@ -219,35 +219,35 @@ export default class BillController extends Controller {
       const user_id = Number(decode.id);
       const params: BillEditType = {
         user_id,
-        id
+        id,
       };
       if (amount) params.amount = amount;
-      if (type_id) params.type_id = type_id; 
-      if (type_name) params.type_name = type_name; 
-      if (date) params.date = date; 
-      if (pay_type) params.pay_type = pay_type; 
-      if (remark) params.remark = remark; 
+      if (type_id) params.type_id = type_id;
+      if (type_name) params.type_name = type_name;
+      if (date) params.date = date;
+      if (pay_type) params.pay_type = pay_type;
+      if (remark) params.remark = remark;
       // 拿到当前用户的账单列表
       const detail = await ctx.service.bill.update(params);
       if (detail) {
         ctx.body = {
           code: 200,
           msg: '请求成功',
-          data: detail
-        }
+          data: detail,
+        };
       } else {
         ctx.body = {
           code: 500,
           msg: '未查询到数据!',
-          data: null
-        }
+          data: null,
+        };
       }
     } catch (error) {
       ctx.body = {
         code: 500,
         msg: '系统错误',
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
@@ -260,8 +260,8 @@ export default class BillController extends Controller {
       ctx.body = {
         code: 400,
         msg: '参数错误',
-        data: null
-      }
+        data: null,
+      };
     }
 
     try {
@@ -274,21 +274,21 @@ export default class BillController extends Controller {
         ctx.body = {
           code: 200,
           msg: '删除成功',
-          data: null
-        }
+          data: null,
+        };
       } else {
         ctx.body = {
           code: 500,
           msg: '未查询到数据!',
-          data: null
-        }
+          data: null,
+        };
       }
     } catch (error) {
       ctx.body = {
         code: 500,
         msg: '系统错误',
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
@@ -307,15 +307,15 @@ export default class BillController extends Controller {
       if (list) {
         // 累加计算支出
         const totalExpense = list.reduce((curr, item) => {
-          if (item.getDataValue('pay_type') == 1) {
+          if (item.getDataValue('pay_type') === 1) {
             curr += Number(item.getDataValue('amount')) || 0;
             return curr;
           }
           return curr;
         }, 0);
         // 累加计算收入
-        let totalIncome = list.reduce((curr, item) => {
-          if (item.getDataValue('pay_type') == 2) {
+        const totalIncome = list.reduce((curr, item) => {
+          if (item.getDataValue('pay_type') === 2) {
             curr += Number(item.getDataValue('amount')) || 0;
             return curr;
           }
@@ -324,13 +324,13 @@ export default class BillController extends Controller {
 
         // 获取收支构成
         let totalData = list.reduce((arr, cur) => {
-          const index = arr.findIndex(item => item.type_id == cur.getDataValue('type_id'));
-          if (index == -1) {
+          const index = arr.findIndex(item => item.type_id === cur.getDataValue('type_id'));
+          if (index === -1) {
             arr.push({
               type_id: cur.getDataValue('type_id'),
               type_name: cur.getDataValue('type_name'),
               pay_type: cur.getDataValue('pay_type'),
-              number: Number(cur.getDataValue('amount'))
+              number: Number(cur.getDataValue('amount')),
             });
           }
           if (index > -1) {
@@ -340,9 +340,9 @@ export default class BillController extends Controller {
         }, [] as Array<dataType>);
 
         totalData = totalData.map(item => {
-          item.number = Number(Number(item.number).toFixed(2))
-          return item
-        })
+          item.number = Number(Number(item.number).toFixed(2));
+          return item;
+        });
 
         ctx.body = {
           code: 200,
@@ -351,21 +351,21 @@ export default class BillController extends Controller {
             totalExpense: Number(totalExpense).toFixed(2),
             totalIncome: Number(totalIncome).toFixed(2),
             totalData: totalData || [],
-          }
-        }
+          },
+        };
       } else {
         ctx.body = {
           code: 500,
           msg: '未查询到数据!',
-          data: null
-        }
+          data: null,
+        };
       }
     } catch (error) {
       ctx.body = {
         code: 500,
         msg: '系统错误',
-        data: null
-      }
+        data: null,
+      };
     }
   }
 }

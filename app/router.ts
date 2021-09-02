@@ -16,4 +16,6 @@ export default (app: Application) => {
   router.post('/api/bill/update', jwtErr, controller.bill.update);
   router.post('/api/bill/delete', jwtErr, controller.bill.delete);
   router.get('/api/bill/data', jwtErr, controller.bill.data);
+
+  router.get('/api/type/list', jwtErr, controller.type.list);
 };

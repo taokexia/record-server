@@ -9,7 +9,7 @@ export type BillType = {
   type_name: string;
   user_id: number;
   remark?: number;
-}
+};
 
 export type BillEditType = Partial<BillType>;
 

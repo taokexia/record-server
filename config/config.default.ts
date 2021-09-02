@@ -20,21 +20,24 @@ export default (appInfo: EggAppInfo) => {
       username: 'root',
       password: '123456',
       database: 'record',
-      timezone: '+08:00'
+      timezone: '+08:00',
     },
     jwt: {
       secret: 'Bob',
     },
     multipart: {
-      mode: 'file'
+      mode: 'file',
     },
     uploadDir: 'public/upload',
+    security: {
+      domainWhiteList: [ 'http://localhost:3000' ],
+    },
     // cors
     cors: {
-      origin: '*',
-      credential: true,
-      allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH'
-    }
+      // origin: 'http://localhost:3000',
+      credentials: true,
+      allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+    },
   };
 
   // the return config will combines to EggAppConfig
