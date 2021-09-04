@@ -9,7 +9,7 @@ logs/
 .vscode
 *.swp
 *.lock
-*.js
+!database/migrations/*.js
 !.autod.conf.js
 
 app/**/*.js
