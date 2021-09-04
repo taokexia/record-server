@@ -1,7 +1,7 @@
 /*
  * @Author: taokexia
  * @Date: 2021-08-29 23:03:16
- * @LastEditTime: 2021-08-31 22:31:44
+ * @LastEditTime: 2021-09-04 11:04:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \record-servercd\app\controller\user.ts
@@ -116,8 +116,8 @@ export default class UserController extends Controller {
         id: userInfo?.getDataValue('id'),
         username: userInfo?.getDataValue('username'),
         signature: userInfo?.getDataValue('signature') || '',
-        avatar: userInfo?.getDataValue('avatar') || defaultAvatar
-      }
+        avatar: userInfo?.getDataValue('avatar') || defaultAvatar,
+      },
     };
   }
 
@@ -135,7 +135,7 @@ export default class UserController extends Controller {
     const result = await ctx.service.user.editUserInfo({
       id: userInfo?.getDataValue('id'),
       signature: signature || userInfo?.getDataValue('signature'),
-      avatar: avatar || userInfo?.getDataValue('avatar')
+      avatar: avatar || userInfo?.getDataValue('avatar'),
     });
     if (result) {
       ctx.body = {
@@ -144,15 +144,78 @@ export default class UserController extends Controller {
         data: {
           signature,
           username: decode.username,
-          avatar: avatar || userInfo?.getDataValue('avatar')
-        }
-      }
+          avatar: avatar || userInfo?.getDataValue('avatar'),
+        },
+      };
     } else {
       ctx.body = {
         code: 500,
         msg: '请求失败',
-        data: result
+        data: result,
+      };
+    }
+  }
+
+  // 修改密码
+  async modifyPassword() {
+    const { ctx } = this;
+    const { password1 = '', password2 = '', oldPassword = '' } = ctx.request.body;
+    if (!password1 || !password2 || !oldPassword) {
+      ctx.body = {
+        code: 500,
+        msg: '请输入密码',
+        data: null,
+      };
+      return;
+    }
+    const encodeOldPassword = ctx.service.user.encode(oldPassword);
+    // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+    const decode = ctx.decode as tokenType;
+    if (!decode) return;
+    // 通过 username 查找 userInfo 完整信息
+    const userInfo = await ctx.service.user.getUserByName(decode.username);
+    if (encodeOldPassword !== userInfo?.getDataValue('password')) {
+      ctx.body = {
+        code: 500,
+        msg: '请输入正确的旧密码',
+        data: null,
+      };
+      return;
+    }
+    if (password1 !== password2) {
+      ctx.body = {
+        code: 500,
+        msg: '两次输入密码不一致',
+        data: null,
+      };
+      return;
+    }
+
+    try {
+      const result = await ctx.service.user.editUserInfo({
+        id: Number(decode.id),
+        password: ctx.service.user.encode(password1),
+      });
+      if (result) {
+        ctx.body = {
+          code: 200,
+          msg: '设置成功',
+          data: null,
+        };
+      } else {
+        ctx.body = {
+          code: 500,
+          msg: '设置失败',
+          data: result,
+        };
       }
+    } catch (error) {
+      console.log(error);
+      ctx.body = {
+        code: 500,
+        msg: '请求失败',
+        data: null,
+      };
     }
   }
 }

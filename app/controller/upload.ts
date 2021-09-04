@@ -34,7 +34,7 @@ export default class UploadController extends Controller {
     ctx.body = {
       code: 200,
       msg: '上传成功',
-      data: uploadDir.replace(/app/g, ''),
+      data: `${ctx.request.protocol}:\\\\${ctx.request.host}\\${uploadDir.replace(/public/g, '')}`,
     };
   }
 }

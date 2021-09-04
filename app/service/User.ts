@@ -6,7 +6,7 @@ export type tokenType = {
   id: string;
   username: string;
   exp: number;
-}
+};
 
 /**
  * User Service
@@ -32,11 +32,11 @@ export default class User extends Service {
     const { app } = this;
     try {
       const result = await app.model.User.update({
-        ...userInfo
+        ...userInfo,
       }, {
         where: {
-          id: userInfo.id
-        }
+          id: userInfo.id,
+        },
       });
       return result;
     } catch (error) {

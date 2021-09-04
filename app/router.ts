@@ -8,6 +8,7 @@ export default (app: Application) => {
   router.post('/api/user/login', controller.user.login);
   router.get('/api/user/getUserInfo', jwtErr, controller.user.getUserInfo);
   router.post('/api/user/editUserInfo', jwtErr, controller.user.editUserInfo);
+  router.post('/api/user/editUserPassword', jwtErr, controller.user.modifyPassword);
   router.post('/api/upload', controller.upload.upload);
 
   router.post('/api/bill/add', jwtErr, controller.bill.add);

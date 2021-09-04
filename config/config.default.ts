@@ -1,4 +1,5 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
+import * as path from 'path';
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -37,6 +38,11 @@ export default (appInfo: EggAppInfo) => {
       // origin: 'http://localhost:3000',
       credentials: true,
       allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+    },
+    // static
+    static: {
+      prefix: '',
+      dir: path.join(appInfo.baseDir, 'public'),
     },
   };
 
